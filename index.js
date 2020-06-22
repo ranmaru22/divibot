@@ -1,15 +1,30 @@
 import Discord from "discord.js";
 
-const client = new Discord.Client();
+// Create the bot instance.
+const bot = new Discord.Client();
 
-client.once("ready", () => {
+// Set command prefix for the bot.
+const PREFIX = "!";
+
+bot.once("ready", () => {
     console.log("Up and running!");
 });
 
-client.on("message", msg => {
-    if (msg.content === "!ping") {
-        msg.channel.send("Pong!");
+bot.on("message", msg => {
+    if (msg.content.substring(0, PREFIX.length) !== PREFIX) {
+        return void 0;
+    } else {
+        const argv = msg.content.substring(PREFIX.length).split(" ");
+        switch (argv[0]) {
+            case "ping":
+                msg.channel.send("Pong!");
+                break;
+            case "version":
+                msg.channel.send(`I am currently running version ${process.env.npm_package_version}.`);
+                break;
+            default: return void 0;
+        }
     }
 });
 
-client.login(process.env.DISCORD_TOKEN)
+bot.login(process.env.DISCORD_TOKEN)
