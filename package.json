@@ -1,0 +1,32 @@
+{
+  "name": "divibot",
+  "version": "0.1.0",
+  "description": "A Discord bot.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "devstart": "nodemon -r dotenv/config index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ranmaru22/divibot.git"
+  },
+  "keywords": [
+    "discord",
+    "bot"
+  ],
+  "author": "ranmaru22",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/ranmaru22/divibot/issues"
+  },
+  "homepage": "https://github.com/ranmaru22/divibot#readme",
+  "dependencies": {
+    "discord.js": "^12.2.0"
+  },
+  "devDependencies": {
+    "dotenv": "^8.2.0",
+    "nodemon": "^2.0.4"
+  }
+}
