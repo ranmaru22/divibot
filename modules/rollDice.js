@@ -3,7 +3,8 @@ const help = [
     "`!r d20` - roll a 20-sided dice",
     "`!r 2d6` - roll two six-sided dice",
     "**OPTIONS**",
-    "`-s` - show stats (number of crits and botches)",
+    "`-tN` - rolls N or higher are marked as successes",
+    "`-fN` - rolls N or lower are marked as failures and count against successes",
     "`-eN` - explode on N or max roll if no number is given (keep rolling and add results together)",
     "`-kN` - keep only the best N rolls",
     "`-dN` - drop the lowest N rolls",
@@ -17,7 +18,8 @@ const rollDice = args => {
     const [numDice, sides] = args[0].toLowerCase().split("d").map(Number);
 
     const options = args.slice(1).join(" ");
-    const showStats = options.match(/-s/);
+    const target = options.match(/-t(\d*)/);
+    const failures = options.match(/-f(\d*)/);
     const explode = options.match(/-e(\d*)/);
     const keep = options.match(/-k(\d*)/);
     const drop = options.match(/-d(\d*)/);
@@ -53,10 +55,30 @@ const rollDice = args => {
         results = rolls;
     }
 
+    const successCnt = target
+        ? results.filter(n => n >= Number(target[1])).length
+        : 0;
+    const failCnt = failures
+        ? results.filter(n => n <= Number(failures[1])).length
+        : 0;
+
     return [
-        results.map(n => (n >= sides ? `\`[${n}]\`` : `\`${n}\``)).join(" "),
-        showStats ? `Crits: ${results.filter(n => n >= sides).length}` : null,
-        showStats ? `Botches: ${results.filter(n => n === 1).length}` : null
+        results
+            .map(n =>
+                target && n >= Number(target[1])
+                    ? `\`[${n}]\``
+                    : failures && n <= Number(failures[1])
+                    ? `\`-${n}-\``
+                    : `\`${n}\``
+            )
+            .join(" "),
+        target && !failures
+            ? `Successes: **${successCnt}**`
+            : target && failures
+            ? `Successes: **${
+                  successCnt - failCnt
+              }** _(${successCnt}-${failCnt})_`
+            : null
     ];
 };
 
