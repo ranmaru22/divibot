@@ -9,18 +9,8 @@ const rollDice = (args, showStats) => {
     }
     return [
         results.map(n => (n === sides ? `\`[${n}]\`` : `\`${n}\``)).join(" "),
-        showStats
-            ? `Crits: ${results.reduce(
-                  (acc, v) => (v === sides ? acc + 1 : acc),
-                  0
-              )}`
-            : null,
-        showStats
-            ? `Botches: ${results.reduce(
-                  (acc, v) => (v === 1 ? acc + 1 : acc),
-                  0
-              )}`
-            : null
+        showStats ? `Crits: ${results.filter(n => n === sides).length}` : null,
+        showStats ? `Botches: ${results.filter(n => n === 1).length}` : null
     ];
 };
 
