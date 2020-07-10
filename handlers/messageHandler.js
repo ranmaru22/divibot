@@ -13,6 +13,7 @@ const messageHandler = msg => {
                 msg.channel.send("Pong!");
                 break;
             case "version":
+            case "v":
                 msg.channel.send(
                     `I am currently running version ${process.env.npm_package_version}.`
                 );
