@@ -20,9 +20,7 @@ const messageHandler = msg => {
                 break;
             case "roll":
             case "r":
-                msg.channel.send(
-                    rollDice(argv[1], argv[2] === "--stats" || argv[2] === "-s")
-                );
+                msg.channel.send(rollDice(argv.slice(1)));
                 break;
             default:
                 return void 0;
