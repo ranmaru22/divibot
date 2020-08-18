@@ -1,0 +1,9 @@
+[package]
+name = "divibot"
+version = "0.1.0"
+authors = ["Alex Sun <alexsun82@icloud.com>"]
+edition = "2018"
+
+[dependencies]
+serenity = "0.9.0-rc.0"
+ron = "0.6.0"
