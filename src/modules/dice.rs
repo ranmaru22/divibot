@@ -53,10 +53,9 @@ pub fn is_delimiter(c: char) -> bool {
 pub fn roll_dice(args: Vec<u32>, opts: RollOptions) -> Option<String> {
     let (sides, num_dice) = match args.len() {
         1 => (args[0], 1),
-        2 => (args[1], args[0]),
+        2 => (args[1], if args[0] == 0 { 1 } else { args[0] }),
         _ => return None,
     };
-
     if sides == 0 {
         return None;
     }
