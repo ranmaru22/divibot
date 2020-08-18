@@ -37,14 +37,20 @@ impl fmt::Display for DiceResults {
     }
 }
 
+/// A variant type of different options for rolling dice.
+pub enum RollOptions {
+    ExplodeOn(u32),
+    Nothing,
+}
+
 /// Returns whether a character is recognizes as an argument delimiter.
 pub fn is_delimiter(c: char) -> bool {
     let delimiters = ['d', 'w'];
     delimiters.contains(&c)
 }
 
-/// Rolls a number of dice as specified in the argument vector.
-pub fn roll(args: Vec<u32>) -> Option<String> {
+/// Rolls dice and respects options passed in as arguments.
+pub fn roll_dice(args: Vec<u32>, opts: RollOptions) -> Option<String> {
     let (sides, num_dice) = match args.len() {
         1 => (args[0], 1),
         2 => (args[1], args[0]),
@@ -55,32 +61,30 @@ pub fn roll(args: Vec<u32>) -> Option<String> {
         return None;
     }
 
+    let results = match opts {
+        RollOptions::ExplodeOn(val) => exploding_roll(sides, num_dice, val),
+        RollOptions::Nothing => roll(sides, num_dice),
+    };
+
+    Some(format!("{}", results))
+}
+
+/// Rolls a number of dice and returns the results.
+fn roll(sides: u32, num_dice: u32) -> DiceResults {
     let mut rng = thread_rng();
     let mut rolls = DiceResults::new(num_dice as usize);
-
     for _ in 0..num_dice {
         let n: u32 = rng.gen_range(1, sides + 1);
         rolls.push(n);
     }
-
-    Some(format!("{}", rolls))
+    rolls
 }
 
-/// Rolls a number of dice and rolls again when the roll matches the explode_on argument.
-pub fn exploding_roll(args: Vec<u32>, explode_on: u32) -> Option<String> {
-    let (sides, num_dice) = match args.len() {
-        1 => (args[0], 1),
-        2 => (args[1], args[0]),
-        _ => return None,
-    };
-
-    if sides == 0 {
-        return None;
-    }
-
+/// Rolls a number of dice, rolls again when the roll matches the explode_on
+/// argument, and restuns the results.,
+fn exploding_roll(sides: u32, num_dice: u32, explode_on: u32) -> DiceResults {
     let mut rng = thread_rng();
     let mut rolls = DiceResults::new(num_dice as usize);
-
     for _ in 0..num_dice {
         let mut result: u32 = 0;
         let mut n;
@@ -93,6 +97,5 @@ pub fn exploding_roll(args: Vec<u32>, explode_on: u32) -> Option<String> {
         }
         rolls.push(result);
     }
-
-    Some(format!("{}", rolls))
+    rolls
 }
