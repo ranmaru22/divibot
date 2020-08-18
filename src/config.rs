@@ -46,11 +46,4 @@ impl Config {
     pub fn prefix(&self) -> &'static str {
         self.prefix
     }
-
-    /// ### fn version() -> &'static str
-    /// Returns the current version.
-    #[allow(dead_code)]
-    pub fn version(&self) -> &'static str {
-        self.version
-    }
 }

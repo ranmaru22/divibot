@@ -2,7 +2,7 @@ use serenity::{
     async_trait,
     framework::standard::{
         macros::{command, group},
-        CommandResult, StandardFramework,
+        Args, CommandResult, StandardFramework,
     },
     model::{channel::Message, gateway::Ready},
     prelude::*,
@@ -10,6 +10,9 @@ use serenity::{
 
 mod config;
 use config::Config;
+
+mod modules;
+use modules::dice;
 
 struct Handler;
 
@@ -22,22 +25,34 @@ impl EventHandler for Handler {
 
 #[command]
 async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
-    if let Err(why) = msg.channel_id.say(&ctx.http, "pong!").await {
+    if let Err(why) = msg.channel_id.say(&ctx.http, "Pong!").await {
         println!("error sending message: {:?}", why)
     }
     Ok(())
 }
 
 #[command]
-async fn foo(ctx: &Context, msg: &Message) -> CommandResult {
-    if let Err(why) = msg.channel_id.say(&ctx.http, "bar").await {
+#[aliases("r")]
+async fn roll(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
+    let dice_args = args
+        .single::<String>()?
+        .split(dice::is_delimiter)
+        .map(|c| c.parse().unwrap_or_default())
+        .collect();
+    let random_rolls = match dice::roll(dice_args) {
+        Some(result) => result,
+        None => return Ok(()),
+    };
+
+    if let Err(why) = msg.channel_id.say(&ctx.http, &random_rolls).await {
         println!("error sending message: {:?}", why)
     }
+
     Ok(())
 }
 
 #[group]
-#[commands(ping, foo)]
+#[commands(ping, roll)]
 struct Public;
 
 #[tokio::main]
