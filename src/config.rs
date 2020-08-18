@@ -3,7 +3,6 @@ use std::env;
 mod internal {
     //! Internal configuration options.
 
-    /// ### const PREFIX
     /// Holds the command prefix for the bot.
     pub const PREFIX: &'static str = "!";
 
@@ -12,7 +11,6 @@ mod internal {
     pub const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 }
 
-/// ### struct Config
 /// Holds configuration data for the bot.
 #[derive(Debug, Clone)]
 pub struct Config {
@@ -25,7 +23,6 @@ pub struct Config {
 }
 
 impl Config {
-    /// ### fn new() -> Self
     /// Creates a configuration instance.
     pub fn new() -> Self {
         Config {
@@ -35,13 +32,11 @@ impl Config {
         }
     }
 
-    /// ### fn token() -> &'static str
     /// Returns the API token.
     pub fn token(&self) -> &str {
         &self.token
     }
 
-    /// ### fn prefix() -> &'static str
     /// Returns the command prefix.
     pub fn prefix(&self) -> &'static str {
         self.prefix
