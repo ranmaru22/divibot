@@ -1,6 +1,34 @@
 use rand::{thread_rng, Rng};
 use std::fmt;
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn dice_roll_works() {
+        let (sides, num_dice) = (6, 3);
+        let results = roll(sides, num_dice);
+        assert!(results.iter().all(|&x| x <= sides));
+        assert!(results.len() == num_dice as usize);
+    }
+    #[test]
+    fn exploding_roll_works() {
+        let (sides, num_dice, explode_on) = (6, 3, 6);
+        let results = exploding_roll(sides, num_dice, explode_on);
+        assert!(results.iter().all(|&x| x % 6 != 0));
+        assert!(results.len() == num_dice as usize);
+    }
+    #[test]
+    fn success_count_works() {
+        let (sides, num_dice) = (6, 3);
+        let results = roll(sides, num_dice);
+        let successes = count_successes(&results, 1);
+        let expected = format!("{} successes!", num_dice);
+        assert_eq!(successes, expected);
+    }
+}
+
 /// A printable collection of dice rolls.
 struct DiceResults {
     rolls: Vec<u32>,
@@ -15,6 +43,14 @@ impl DiceResults {
 
     pub fn push(&mut self, item: u32) {
         self.rolls.push(item);
+    }
+
+    pub fn iter(&self) -> std::slice::Iter<'_, u32> {
+        self.rolls.iter()
+    }
+
+    pub fn len(&self) -> usize {
+        self.rolls.len()
     }
 }
 
@@ -40,6 +76,7 @@ impl fmt::Display for DiceResults {
 /// A variant type of different options for rolling dice.
 pub enum RollOptions {
     ExplodeOn(u32),
+    CountSuccesses(u32),
     Nothing,
 }
 
@@ -61,11 +98,19 @@ pub fn roll_dice(args: Vec<u32>, opts: RollOptions) -> Option<String> {
     }
 
     let results = match opts {
-        RollOptions::ExplodeOn(val) => exploding_roll(sides, num_dice, val),
-        RollOptions::Nothing => roll(sides, num_dice),
+        RollOptions::ExplodeOn(val) => format!("{}", exploding_roll(sides, num_dice, val)),
+        RollOptions::CountSuccesses(val) => {
+            let rolls = roll(sides, num_dice);
+            format!(
+                "{}, {}",
+                rolls,
+                count_successes(&rolls, if val == 0 { sides } else { val })
+            )
+        }
+        RollOptions::Nothing => format!("{}", roll(sides, num_dice)),
     };
 
-    Some(format!("{}", results))
+    Some(results)
 }
 
 /// Rolls a number of dice and returns the results.
@@ -97,4 +142,17 @@ fn exploding_roll(sides: u32, num_dice: u32, explode_on: u32) -> DiceResults {
         rolls.push(result);
     }
     rolls
+}
+
+fn count_successes(rolls: &DiceResults, threshold: u32) -> String {
+    let mut successes: u32 = 0;
+    for x in rolls.iter() {
+        if *x >= threshold {
+            successes += 1;
+        }
+    }
+    match successes {
+        1 => format!("{} success!", successes),
+        _ => format!("{} successes!", successes),
+    }
 }
