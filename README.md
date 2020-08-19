@@ -6,6 +6,17 @@ feature-complete and get extended every now and so often.
 
 For now it can do basic dice rolls for pen and paper games.
 
+## Installation & Running
+
+You need to have [Rust and Cargo](https://www.rust-lang.org/tools/install) installed.
+
+```bash
+git clone git@github.com:ranmaru22/divibot.git
+cd divibot
+cargo build
+DISCORD_TOKEN="your token" ./target/debug/divibot
+```
+
 ## Commands
 
 ### Ping
@@ -26,7 +37,7 @@ You can trigger a roll with the `!roll` (short: `!r`) command.
 > [3, 4, 6]
 ```
 
-Optional arguments are `-c` for couting successes, and `-e` for exploding
+Optional arguments are `-c` for counting successes, and `-e` for exploding
 rolls (keep rolling when rolling the target number and sum up the results).
 
 ```
@@ -44,4 +55,4 @@ rolls (keep rolling when rolling the target number and sum up the results).
 
 ## License
 
-DiviBot is licensed under the GPL v3.0 or later. See LICENSE file for details.
+DiviBot is licensed under the GPL v3.0 or later. See the LICENSE file for details.
