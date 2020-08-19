@@ -17,6 +17,25 @@ async fn roll(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         .map(|c| c.parse().unwrap_or_default())
         .collect();
 
+    let opts = if args.is_empty() {
+        vec![RollOptions::Nothing]
+    } else {
+        create_opts(args)
+    };
+
+    let rolls = match dice::roll_dice(dice_args, opts) {
+        Some(result) => result,
+        None => return Ok(()),
+    };
+
+    if let Err(why) = msg.channel_id.say(&ctx.http, &rolls).await {
+        println!("error sending message: {:?}", why)
+    }
+
+    Ok(())
+}
+
+fn create_opts(mut args: Args) -> Vec<RollOptions> {
     let mut opts = Vec::new();
     while !args.is_empty() {
         if let Ok(opt) = args.single::<String>() {
@@ -33,20 +52,7 @@ async fn roll(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
             }
         }
     }
-    if opts.is_empty() {
-        opts.push(RollOptions::Nothing);
-    }
-
-    let random_rolls = match dice::roll_dice(dice_args, opts) {
-        Some(result) => result,
-        None => return Ok(()),
-    };
-
-    if let Err(why) = msg.channel_id.say(&ctx.http, &random_rolls).await {
-        println!("error sending message: {:?}", why)
-    }
-
-    Ok(())
+    opts
 }
 
 fn arg_parse(arg: &str, split_on: &str) -> u32 {
