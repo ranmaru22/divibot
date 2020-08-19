@@ -58,7 +58,6 @@ pub fn roll_dice(args: Vec<u32>, mut opts: Vec<RollOptions>) -> Option<String> {
     if !opts.is_empty() {
         opts.sort();
         for opt in opts.iter() {
-            println!("Do: {:?}", opt);
             match opt {
                 RollOptions::Nothing => break,
                 RollOptions::ExplodeOn(val) => results = exploding_roll(sides, num_dice, *val),
