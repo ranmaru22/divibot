@@ -5,7 +5,8 @@ use serenity::{
 };
 
 mod dice;
-use dice::RollOptions;
+mod types;
+use types::RollOptions;
 
 #[command]
 #[aliases("r")]
