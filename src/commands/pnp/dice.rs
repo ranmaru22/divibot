@@ -62,6 +62,8 @@ pub fn roll_dice(args: Vec<u32>, mut opts: Vec<RollOptions>) -> Option<String> {
                 RollOptions::Nothing => break,
                 RollOptions::ExplodeOn(val) => results = exploding_roll(sides, num_dice, *val),
                 RollOptions::CountSuccesses(val) => results.set_succ_threshold(*val),
+                RollOptions::KeepBest(val) => results.keep_best(*val),
+                RollOptions::DropLowest(val) => results.drop_lowest(*val),
             }
         }
     }
