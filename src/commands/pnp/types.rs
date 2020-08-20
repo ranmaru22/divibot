@@ -9,15 +9,19 @@ mod test {
     fn ordering_roll_options_works() {
         let nothing = RollOptions::Nothing;
         let explode = RollOptions::ExplodeOn(1);
+        let keep = RollOptions::KeepBest(1);
         let successes = RollOptions::CountSuccesses(1);
         assert!(nothing < explode);
         assert!(successes > explode);
+        assert!(keep > explode);
+        assert!(successes > keep);
         assert!(successes == successes);
-        let mut v = vec![explode, successes, nothing];
+        let mut v = vec![explode, successes, keep, nothing];
         v.sort();
         assert_eq!(v[0], RollOptions::Nothing);
         assert_eq!(v[1], RollOptions::ExplodeOn(1));
-        assert_eq!(v[2], RollOptions::CountSuccesses(1));
+        assert_eq!(v[2], RollOptions::KeepBest(1));
+        assert_eq!(v[3], RollOptions::CountSuccesses(1));
     }
 
     #[test]
@@ -126,8 +130,10 @@ impl fmt::Display for DiceResults {
 /// A variant type of different options for rolling dice.
 #[derive(Debug, PartialEq, Eq)]
 pub enum RollOptions {
-    ExplodeOn(u32),
     CountSuccesses(u32),
+    KeepBest(usize),
+    DropLowest(usize),
+    ExplodeOn(u32),
     Nothing,
 }
 
@@ -145,8 +151,20 @@ impl PartialOrd for RollOptions {
             },
             RollOptions::ExplodeOn(_) => match other {
                 RollOptions::ExplodeOn(_) => Some(Ordering::Equal),
-                RollOptions::CountSuccesses(_) => Some(Ordering::Less),
                 RollOptions::Nothing => Some(Ordering::Greater),
+                _ => Some(Ordering::Less),
+            },
+            RollOptions::DropLowest(_) => match other {
+                RollOptions::DropLowest(_) => Some(Ordering::Equal),
+                RollOptions::KeepBest(_) => Some(Ordering::Equal),
+                RollOptions::CountSuccesses(_) => Some(Ordering::Less),
+                _ => Some(Ordering::Greater),
+            },
+            RollOptions::KeepBest(_) => match other {
+                RollOptions::DropLowest(_) => Some(Ordering::Equal),
+                RollOptions::KeepBest(_) => Some(Ordering::Equal),
+                RollOptions::CountSuccesses(_) => Some(Ordering::Less),
+                _ => Some(Ordering::Greater),
             },
         }
     }
@@ -166,8 +184,20 @@ impl Ord for RollOptions {
             },
             RollOptions::ExplodeOn(_) => match other {
                 RollOptions::ExplodeOn(_) => Ordering::Equal,
-                RollOptions::CountSuccesses(_) => Ordering::Less,
                 RollOptions::Nothing => Ordering::Greater,
+                _ => Ordering::Less,
+            },
+            RollOptions::DropLowest(_) => match other {
+                RollOptions::DropLowest(_) => Ordering::Equal,
+                RollOptions::KeepBest(_) => Ordering::Equal,
+                RollOptions::CountSuccesses(_) => Ordering::Less,
+                _ => Ordering::Greater,
+            },
+            RollOptions::KeepBest(_) => match other {
+                RollOptions::DropLowest(_) => Ordering::Equal,
+                RollOptions::KeepBest(_) => Ordering::Equal,
+                RollOptions::CountSuccesses(_) => Ordering::Less,
+                _ => Ordering::Greater,
             },
         }
     }
