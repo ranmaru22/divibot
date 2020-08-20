@@ -44,7 +44,7 @@ rolls (keep rolling when rolling the target number and sum up the results).
 !r 3d6 -c6
 > [3, 4, 6] - 1 success!
 
-!r 3d6 -e6 -e10
+!r 3d6 -c6 -e10
 > [3, 4, 11] - 1 success!
 ```
 
