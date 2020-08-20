@@ -19,6 +19,24 @@ mod test {
         assert_eq!(v[1], RollOptions::ExplodeOn(1));
         assert_eq!(v[2], RollOptions::CountSuccesses(1));
     }
+
+    #[test]
+    fn splitting_works() {
+        let mut sample1 = DiceResults {
+            rolls: vec![5, 2, 4, 6, 6, 1, 1],
+            succ_threshold: None,
+            successes: None,
+        };
+        sample1.keep_best(3);
+        assert!(sample1.rolls == [5, 6, 6]);
+        let mut sample2 = DiceResults {
+            rolls: vec![5, 2, 4, 6, 6, 1, 1],
+            succ_threshold: None,
+            successes: None,
+        };
+        sample2.drop_lowest(3);
+        assert!(sample2.rolls == [4, 5, 6, 6]);
+    }
 }
 
 /// A printable collection of dice rolls.
@@ -62,6 +80,18 @@ impl DiceResults {
             }
             self.successes = Some(successes);
         }
+    }
+
+    pub fn keep_best(&mut self, n: usize) {
+        self.rolls.sort();
+        let (_, right) = self.rolls.split_at(self.rolls.len() - n);
+        self.rolls = right.to_vec();
+    }
+
+    pub fn drop_lowest(&mut self, n: usize) {
+        self.rolls.sort();
+        let (_, right) = self.rolls.split_at(n);
+        self.rolls = right.to_vec();
     }
 }
 
