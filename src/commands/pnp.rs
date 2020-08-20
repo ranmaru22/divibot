@@ -48,6 +48,14 @@ fn create_opts(mut args: Args) -> Vec<RollOptions> {
                     let arg = arg_parse(&opt, "-c");
                     opts.push(RollOptions::CountSuccesses(arg));
                 }
+                opt if opt.contains("-k") => {
+                    let arg = arg_parse(&opt, "-k");
+                    opts.push(RollOptions::KeepBest(arg as usize));
+                }
+                opt if opt.contains("-d") => {
+                    let arg = arg_parse(&opt, "-d");
+                    opts.push(RollOptions::DropLowest(arg as usize));
+                }
                 _ => continue,
             }
         }
