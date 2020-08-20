@@ -48,6 +48,17 @@ rolls (keep rolling when rolling the target number and sum up the results).
 > [3, 4, 11] - 1 success!
 ```
 
+You can keep only the best N rolls or drop the lowest N rolls of your results
+with the `-k` and `-d` flags. In both cases the results will be sorted.
+
+```
+!r 5d6 -k2
+> [4, 6]
+
+!r 5d6 -d2
+> [3, 4, 6]
+```
+
 ## Credits
 
 - [serenity](https://github.com/serenity-rs/serenity) - Discord API library
