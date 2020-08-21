@@ -64,18 +64,18 @@ pub fn roll_dice(args: Vec<u32>, mut opts: Vec<RollOptions>) -> Option<String> {
     }
 
     let mut reroll: Option<u32> = None;
-    let mut results = roll(sides, num_dice, None);
+    let mut results = roll(sides, num_dice, reroll);
     if !opts.is_empty() {
         opts.sort();
         for opt in opts.iter() {
             match opt {
-                RollOptions::RerollOn(val) => reroll = Some(*val),
-                RollOptions::Nothing => match reroll {
-                    None => continue,
-                    Some(_) => results = roll(sides, num_dice, reroll),
-                },
+                RollOptions::Nothing => continue,
+                RollOptions::RerollOn(val) => {
+                    reroll = Some(*val);
+                    results = roll(sides, num_dice, reroll);
+                }
                 RollOptions::ExplodeOn(val) => {
-                    results = exploding_roll(sides, num_dice, *val, reroll)
+                    results = exploding_roll(sides, num_dice, *val, reroll);
                 }
                 RollOptions::CountSuccesses(val) => results.set_succ_threshold(*val),
                 RollOptions::KeepBest(val) => results.keep_best(*val),
