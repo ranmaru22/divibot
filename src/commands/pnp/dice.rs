@@ -16,9 +16,9 @@ mod tests {
 
     #[test]
     fn reroll_works() {
-        let (sides, num_dice, reroll) = (6, 100, 3);
+        let (sides, num_dice, reroll) = (2, 100, 1);
         let results = roll(sides, num_dice, Some(reroll));
-        assert!(results.iter().all(|&x| x != reroll));
+        assert!(results.iter().all(|&x| x == 2));
         assert!(results.len() == num_dice as usize);
     }
 
