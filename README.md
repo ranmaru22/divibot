@@ -48,6 +48,14 @@ rolls (keep rolling when rolling the target number and sum up the results).
 > [3, 4, 11] - 1 success!
 ```
 
+The `-r` argument will reroll any die that matches this roll. When combined
+with with exploding rolls, this only applies to the first roll.
+
+```
+!r 3d2 -r1
+> [2, 2, 2]
+```
+
 You can keep only the best N rolls or drop the lowest N rolls of your results
 with the `-k` and `-d` flags. In both cases the results will be sorted.
 
