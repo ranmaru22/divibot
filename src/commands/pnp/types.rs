@@ -8,20 +8,23 @@ mod test {
     #[test]
     fn ordering_roll_options_works() {
         let nothing = RollOptions::Nothing;
+        let reroll = RollOptions::RerollOn(1);
         let explode = RollOptions::ExplodeOn(1);
         let keep = RollOptions::KeepBest(1);
         let successes = RollOptions::CountSuccesses(1);
         assert!(nothing < explode);
+        assert!(explode > reroll);
         assert!(successes > explode);
         assert!(keep > explode);
         assert!(successes > keep);
         assert!(successes == successes);
-        let mut v = vec![explode, successes, keep, nothing];
+        let mut v = vec![explode, successes, reroll, keep, nothing];
         v.sort();
         assert_eq!(v[0], RollOptions::Nothing);
-        assert_eq!(v[1], RollOptions::ExplodeOn(1));
-        assert_eq!(v[2], RollOptions::KeepBest(1));
-        assert_eq!(v[3], RollOptions::CountSuccesses(1));
+        assert_eq!(v[1], RollOptions::RerollOn(1));
+        assert_eq!(v[2], RollOptions::ExplodeOn(1));
+        assert_eq!(v[3], RollOptions::KeepBest(1));
+        assert_eq!(v[4], RollOptions::CountSuccesses(1));
     }
 
     #[test]
@@ -134,6 +137,7 @@ pub enum RollOptions {
     KeepBest(usize),
     DropLowest(usize),
     ExplodeOn(u32),
+    RerollOn(u32),
     Nothing,
 }
 
@@ -145,13 +149,15 @@ impl PartialOrd for RollOptions {
                 RollOptions::Nothing => Some(Ordering::Equal),
                 _ => Some(Ordering::Less),
             },
-            RollOptions::CountSuccesses(_) => match other {
-                RollOptions::CountSuccesses(_) => Some(Ordering::Equal),
+            RollOptions::RerollOn(_) => match other {
+                RollOptions::RerollOn(_) => Some(Ordering::Equal),
+                RollOptions::Nothing => Some(Ordering::Less),
                 _ => Some(Ordering::Greater),
             },
             RollOptions::ExplodeOn(_) => match other {
                 RollOptions::ExplodeOn(_) => Some(Ordering::Equal),
                 RollOptions::Nothing => Some(Ordering::Greater),
+                RollOptions::RerollOn(_) => Some(Ordering::Greater),
                 _ => Some(Ordering::Less),
             },
             RollOptions::DropLowest(_) => match other {
@@ -164,6 +170,10 @@ impl PartialOrd for RollOptions {
                 RollOptions::DropLowest(_) => Some(Ordering::Equal),
                 RollOptions::KeepBest(_) => Some(Ordering::Equal),
                 RollOptions::CountSuccesses(_) => Some(Ordering::Less),
+                _ => Some(Ordering::Greater),
+            },
+            RollOptions::CountSuccesses(_) => match other {
+                RollOptions::CountSuccesses(_) => Some(Ordering::Equal),
                 _ => Some(Ordering::Greater),
             },
         }
@@ -178,13 +188,15 @@ impl Ord for RollOptions {
                 RollOptions::Nothing => Ordering::Equal,
                 _ => Ordering::Less,
             },
-            RollOptions::CountSuccesses(_) => match other {
-                RollOptions::CountSuccesses(_) => Ordering::Equal,
+            RollOptions::RerollOn(_) => match other {
+                RollOptions::RerollOn(_) => Ordering::Equal,
+                RollOptions::Nothing => Ordering::Less,
                 _ => Ordering::Greater,
             },
             RollOptions::ExplodeOn(_) => match other {
                 RollOptions::ExplodeOn(_) => Ordering::Equal,
                 RollOptions::Nothing => Ordering::Greater,
+                RollOptions::RerollOn(_) => Ordering::Greater,
                 _ => Ordering::Less,
             },
             RollOptions::DropLowest(_) => match other {
@@ -197,6 +209,10 @@ impl Ord for RollOptions {
                 RollOptions::DropLowest(_) => Ordering::Equal,
                 RollOptions::KeepBest(_) => Ordering::Equal,
                 RollOptions::CountSuccesses(_) => Ordering::Less,
+                _ => Ordering::Greater,
+            },
+            RollOptions::CountSuccesses(_) => match other {
+                RollOptions::CountSuccesses(_) => Ordering::Equal,
                 _ => Ordering::Greater,
             },
         }
