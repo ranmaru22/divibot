@@ -40,6 +40,10 @@ fn create_opts(mut args: Args) -> Vec<RollOptions> {
     while !args.is_empty() {
         if let Ok(opt) = args.single::<String>() {
             match opt {
+                opt if opt.contains("-r") => {
+                    let arg = arg_parse(&opt, "-r");
+                    opts.push(RollOptions::RerollOn(arg));
+                }
                 opt if opt.contains("-e") => {
                     let arg = arg_parse(&opt, "-e");
                     opts.push(RollOptions::ExplodeOn(arg));
