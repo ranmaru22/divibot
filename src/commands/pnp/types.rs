@@ -51,6 +51,7 @@ pub struct DiceResults {
     rolls: Vec<u32>,
     succ_threshold: Option<u32>,
     successes: Option<u32>,
+    reroll_on: Option<u32>,
 }
 
 impl DiceResults {
@@ -59,6 +60,7 @@ impl DiceResults {
             rolls: Vec::with_capacity(size),
             succ_threshold: None,
             successes: None,
+            reroll_on: None,
         }
     }
 
@@ -99,6 +101,10 @@ impl DiceResults {
         self.rolls.sort();
         let (_, right) = self.rolls.split_at(n);
         self.rolls = right.to_vec();
+    }
+
+    pub fn set_reroll(&mut self, n: u32) {
+        self.reroll_on = Some(n);
     }
 }
 
