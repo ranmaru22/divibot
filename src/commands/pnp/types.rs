@@ -7,21 +7,21 @@ mod test {
 
     #[test]
     fn ordering_roll_options_works() {
-        let nothing = RollOptions::Nothing;
-        let reroll = RollOptions::RerollOn(1);
-        let explode = RollOptions::ExplodeOn(1);
-        let keep = RollOptions::KeepBest(1);
-        let successes = RollOptions::CountSuccesses(1);
+        let (nothing, reroll, explode, keep, successes) = (
+            RollOptions::Nothing,
+            RollOptions::RerollOn(1),
+            RollOptions::ExplodeOn(1),
+            RollOptions::KeepBest(1),
+            RollOptions::CountSuccesses(1),
+        );
+        assert!(reroll < nothing);
         assert!(nothing < explode);
-        assert!(explode > reroll);
-        assert!(successes > explode);
-        assert!(keep > explode);
-        assert!(successes > keep);
-        assert!(successes == successes);
+        assert!(explode < keep);
+        assert!(keep < successes);
         let mut v = vec![explode, successes, reroll, keep, nothing];
         v.sort();
-        assert_eq!(v[0], RollOptions::Nothing);
-        assert_eq!(v[1], RollOptions::RerollOn(1));
+        assert_eq!(v[0], RollOptions::RerollOn(1));
+        assert_eq!(v[1], RollOptions::Nothing);
         assert_eq!(v[2], RollOptions::ExplodeOn(1));
         assert_eq!(v[3], RollOptions::KeepBest(1));
         assert_eq!(v[4], RollOptions::CountSuccesses(1));
@@ -51,7 +51,6 @@ pub struct DiceResults {
     rolls: Vec<u32>,
     succ_threshold: Option<u32>,
     successes: Option<u32>,
-    reroll_on: Option<u32>,
 }
 
 impl DiceResults {
@@ -60,7 +59,6 @@ impl DiceResults {
             rolls: Vec::with_capacity(size),
             succ_threshold: None,
             successes: None,
-            reroll_on: None,
         }
     }
 
@@ -68,10 +66,12 @@ impl DiceResults {
         self.rolls.push(item);
     }
 
+    #[allow(dead_code)] // Used for debugging
     pub fn iter(&self) -> std::slice::Iter<'_, u32> {
         self.rolls.iter()
     }
 
+    #[allow(dead_code)] // Used for debugging
     pub fn len(&self) -> usize {
         self.rolls.len()
     }
@@ -101,10 +101,6 @@ impl DiceResults {
         self.rolls.sort();
         let (_, right) = self.rolls.split_at(n);
         self.rolls = right.to_vec();
-    }
-
-    pub fn set_reroll(&mut self, n: u32) {
-        self.reroll_on = Some(n);
     }
 }
 
@@ -151,14 +147,14 @@ impl PartialOrd for RollOptions {
     #[inline]
     fn partial_cmp(&self, other: &RollOptions) -> Option<Ordering> {
         match self {
-            RollOptions::Nothing => match other {
-                RollOptions::Nothing => Some(Ordering::Equal),
-                _ => Some(Ordering::Less),
-            },
             RollOptions::RerollOn(_) => match other {
                 RollOptions::RerollOn(_) => Some(Ordering::Equal),
-                RollOptions::Nothing => Some(Ordering::Less),
-                _ => Some(Ordering::Greater),
+                _ => Some(Ordering::Less),
+            },
+            RollOptions::Nothing => match other {
+                RollOptions::Nothing => Some(Ordering::Equal),
+                RollOptions::RerollOn(_) => Some(Ordering::Greater),
+                _ => Some(Ordering::Less),
             },
             RollOptions::ExplodeOn(_) => match other {
                 RollOptions::ExplodeOn(_) => Some(Ordering::Equal),
@@ -190,14 +186,14 @@ impl Ord for RollOptions {
     #[inline]
     fn cmp(&self, other: &RollOptions) -> Ordering {
         match self {
-            RollOptions::Nothing => match other {
-                RollOptions::Nothing => Ordering::Equal,
-                _ => Ordering::Less,
-            },
             RollOptions::RerollOn(_) => match other {
                 RollOptions::RerollOn(_) => Ordering::Equal,
-                RollOptions::Nothing => Ordering::Less,
-                _ => Ordering::Greater,
+                _ => Ordering::Less,
+            },
+            RollOptions::Nothing => match other {
+                RollOptions::Nothing => Ordering::Equal,
+                RollOptions::RerollOn(_) => Ordering::Greater,
+                _ => Ordering::Less,
             },
             RollOptions::ExplodeOn(_) => match other {
                 RollOptions::ExplodeOn(_) => Ordering::Equal,
